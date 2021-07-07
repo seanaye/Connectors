@@ -1,4 +1,4 @@
-export async function getAuth0Client({
+export function getAuth0Client({
   clientId,
   clientSecret,
 }: {
@@ -31,12 +31,15 @@ export async function getAuth0Client({
   };
 
   // cache access token
-  let accessToken = await getAccessToken();
+  let accessToken = ""
 
   const authedFetch = async <T = Record<string, any>>(
     url: string,
     opts?: RequestInit
   ): Promise<{ data: T; res: Response }> => {
+    if (!accessToken) {
+      accessToken = await getAccessToken()
+    }
     // build authentication header
     const headers = { authorization: `Bearer ${accessToken}` };
     const newOpts = Object.assign(opts || {}, { headers });
