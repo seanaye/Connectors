@@ -36,7 +36,7 @@ export async function getAuth0Client({
   const authedFetch = async <T = Record<string, any>>(
     url: string,
     opts?: RequestInit
-  ): Promise<[number, T]> => {
+  ): Promise<{ data: T; res: Response }> => {
     // build authentication header
     const headers = { authorization: `Bearer ${accessToken}` };
     const newOpts = Object.assign(opts || {}, { headers });
@@ -48,7 +48,7 @@ export async function getAuth0Client({
       return await authedFetch(url, opts);
     }
     const body = await res.json();
-    return [res.status, body as T];
+    return { res, data: body as T };
   };
 
   const baseUrl = "https://coparse.auth0.com/api/v2";
