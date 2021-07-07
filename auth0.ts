@@ -1,0 +1,82 @@
+export async function getAuth0Client({
+  clientId,
+  clientSecret,
+}: {
+  clientId?: string;
+  clientSecret?: string;
+}) {
+  if (!clientId || !clientSecret) {
+    throw new Error(
+      `Could not initialize auth0 client, env vars not set. ${JSON.stringify({
+        clientId,
+        clientSecret,
+      })}`
+    );
+  }
+  const getAccessToken = async () => {
+    // get token to access auth0 management api
+    const tokenRes = await fetch("https://coparse.auth0.com/oauth/token", {
+      headers: { "content-type": "application/json" },
+      method: "POST",
+      body: JSON.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        audience: "https://coparse.auth0.com/api/v2/",
+        grant_type: "client_credentials",
+      }),
+    });
+
+    const { access_token } = await tokenRes.json();
+    return access_token;
+  };
+
+  // cache access token
+  let accessToken = await getAccessToken();
+
+  const authedFetch = async <T = Record<string, any>>(
+    url: string,
+    opts?: RequestInit
+  ): Promise<[number, T]> => {
+    // build authentication header
+    const headers = { authorization: `Bearer ${accessToken}` };
+    const newOpts = Object.assign(opts || {}, { headers });
+    const res = await fetch(url, newOpts);
+    if (res.status === 401) {
+      // refresh access token
+      accessToken = await getAccessToken();
+      // retry request
+      return await authedFetch(url, opts);
+    }
+    const body = await res.json();
+    return [res.status, body as T];
+  };
+
+  const baseUrl = "https://coparse.auth0.com/api/v2";
+
+  // object structure should reflect https://auth0.com/docs/api/management/v2#!/Users/get_user_roles
+  return {
+    users: {
+      // get a users roles
+      roles: async (id: string) => {
+        //https://auth0.com/docs/api/management/v2#!/Users/get_user_roles
+        return await authedFetch<
+          { id: string; name: string; description: string }[]
+        >(`${baseUrl}/users/${id}/roles`);
+      },
+      addRoles: async ({ id, roles }: { id: string; roles: string[] }) => {
+        //https://auth0.com/docs/api/management/v2#!/Users/post_user_roles
+        return await authedFetch<null>(`${baseUrl}/users/${id}/roles`, {
+          method: "POST",
+          body: JSON.stringify({ roles }),
+        });
+      },
+      //https://auth0.com/docs/api/management/v2#!/Users/delete_user_roles
+      deleteRoles: async ({ id, roles }: { id: string; roles: string[] }) => {
+        return await authedFetch(`${baseUrl}/users/${id}/roles`, {
+          method: "DELETE",
+          body: JSON.stringify({ roles }),
+        });
+      },
+    },
+  };
+}
