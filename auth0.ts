@@ -60,22 +60,22 @@ export function getAuth0Client({
   return {
     users: {
       // get a users roles
-      roles: async (id: string) => {
+      roles: (id: string) => {
         //https://auth0.com/docs/api/management/v2#!/Users/get_user_roles
-        return await authedFetch<
+        return authedFetch<
           { id: string; name: string; description: string }[]
         >(`${baseUrl}/users/${id}/roles`);
       },
-      addRoles: async ({ id, roles }: { id: string; roles: string[] }) => {
+      addRoles: ({ id, roles }: { id: string; roles: string[] }) => {
         //https://auth0.com/docs/api/management/v2#!/Users/post_user_roles
-        return await authedFetch<null>(`${baseUrl}/users/${id}/roles`, {
+        return authedFetch<null>(`${baseUrl}/users/${id}/roles`, {
           method: "POST",
           body: JSON.stringify({ roles }),
         });
       },
       //https://auth0.com/docs/api/management/v2#!/Users/delete_user_roles
-      deleteRoles: async ({ id, roles }: { id: string; roles: string[] }) => {
-        return await authedFetch(`${baseUrl}/users/${id}/roles`, {
+      deleteRoles: ({ id, roles }: { id: string; roles: string[] }) => {
+        return authedFetch(`${baseUrl}/users/${id}/roles`, {
           method: "DELETE",
           body: JSON.stringify({ roles }),
         });
