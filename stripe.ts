@@ -1,4 +1,4 @@
-export const getStripeClient = (stripeKey: string) => {
+export const getStripeClient = ({ stripeKey }: { stripeKey: string }) => {
   const baseUrl = "https://api.stripe.com/v1";
   const authedFetch = async <T = Record<string, any>>(
     url: string,
