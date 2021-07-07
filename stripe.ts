@@ -20,3 +20,5 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
       authedFetch(`${baseUrl}/customers/${customerId}`),
   };
 };
+
+export type StripeClient = ReturnType<typeof getStripeClient>

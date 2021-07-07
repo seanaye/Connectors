@@ -80,3 +80,5 @@ export async function getAuth0Client({
     },
   };
 }
+
+export type Auth0Client = ReturnType<typeof getAuth0Client>
