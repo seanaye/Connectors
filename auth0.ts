@@ -70,10 +70,12 @@ export function getAuth0Client({
         );
       },
       addRoles: ({ id, roles }: { id: string; roles: string[] }) => {
+        const body = JSON.stringify({ roles })
+        console.log({ body })
         //https://auth0.com/docs/api/management/v2#!/Users/post_user_roles
         return authedFetch<null>(`${baseUrl}/users/${id}/roles`, {
           method: "POST",
-          body: JSON.stringify({ roles }),
+          body
         });
       },
       //https://auth0.com/docs/api/management/v2#!/Users/delete_user_roles
