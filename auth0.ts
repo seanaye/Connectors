@@ -1,16 +1,23 @@
+import { buildResponse, ReturnValue } from "./_utils.ts";
+
 export function getAuth0Client({
   clientId,
   clientSecret,
+  baseUrl
 }: {
   clientId?: string;
   clientSecret?: string;
+  baseUrl?: string
 }) {
-  if (!clientId || !clientSecret) {
+  if (!clientId || !clientSecret || !baseUrl) {
     throw new Error(
-      `Could not initialize auth0 client, env vars not set. ${JSON.stringify({
-        clientId,
-        clientSecret,
-      })}`
+      `Could not initialize auth0 client, env vars not set. ${
+        JSON.stringify({
+          clientId,
+          clientSecret,
+          baseUrl
+        })
+      }`,
     );
   }
   const getAccessToken = async () => {
@@ -35,8 +42,8 @@ export function getAuth0Client({
 
   const authedFetch = async <T = Record<string, any>>(
     url: string,
-    opts?: RequestInit
-  ): Promise<{ data: T; res: Response }> => {
+    opts?: RequestInit,
+  ): ReturnValue<T> => {
     if (!accessToken) {
       accessToken = await getAccessToken();
     }
@@ -53,11 +60,8 @@ export function getAuth0Client({
       // retry request
       return await authedFetch(url, opts);
     }
-    const body = await res.json();
-    return { res, data: body as T };
+    return await buildResponse<T>(res)
   };
-
-  const baseUrl = "https://coparse.auth0.com/api/v2";
 
   // object structure should reflect https://auth0.com/docs/api/management/v2#!/Users/get_user_roles
   return {
@@ -66,16 +70,14 @@ export function getAuth0Client({
       roles: (id: string) => {
         //https://auth0.com/docs/api/management/v2#!/Users/get_user_roles
         return authedFetch<{ id: string; name: string; description: string }[]>(
-          `${baseUrl}/users/${id}/roles`
+          `${baseUrl}/users/${id}/roles`,
         );
       },
       addRoles: ({ id, roles }: { id: string; roles: string[] }) => {
-        const body = JSON.stringify({ roles })
-        console.log({ body })
         //https://auth0.com/docs/api/management/v2#!/Users/post_user_roles
         return authedFetch<null>(`${baseUrl}/users/${id}/roles`, {
           method: "POST",
-          body
+          body: JSON.stringify({ roles }),
         });
       },
       //https://auth0.com/docs/api/management/v2#!/Users/delete_user_roles
