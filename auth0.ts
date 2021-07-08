@@ -31,17 +31,20 @@ export function getAuth0Client({
   };
 
   // cache access token
-  let accessToken = ""
+  let accessToken = "";
 
   const authedFetch = async <T = Record<string, any>>(
     url: string,
     opts?: RequestInit
   ): Promise<{ data: T; res: Response }> => {
     if (!accessToken) {
-      accessToken = await getAccessToken()
+      accessToken = await getAccessToken();
     }
     // build authentication header
-    const headers = { authorization: `Bearer ${accessToken}` };
+    const headers = {
+      authorization: `Bearer ${accessToken}`,
+      "content-type": "application/json",
+    };
     const newOpts = Object.assign(opts || {}, { headers });
     const res = await fetch(url, newOpts);
     if (res.status === 401) {
@@ -62,9 +65,9 @@ export function getAuth0Client({
       // get a users roles
       roles: (id: string) => {
         //https://auth0.com/docs/api/management/v2#!/Users/get_user_roles
-        return authedFetch<
-          { id: string; name: string; description: string }[]
-        >(`${baseUrl}/users/${id}/roles`);
+        return authedFetch<{ id: string; name: string; description: string }[]>(
+          `${baseUrl}/users/${id}/roles`
+        );
       },
       addRoles: ({ id, roles }: { id: string; roles: string[] }) => {
         //https://auth0.com/docs/api/management/v2#!/Users/post_user_roles
@@ -84,4 +87,4 @@ export function getAuth0Client({
   };
 }
 
-export type Auth0Client = ReturnType<typeof getAuth0Client>
+export type Auth0Client = ReturnType<typeof getAuth0Client>;
