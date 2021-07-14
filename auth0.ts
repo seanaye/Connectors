@@ -1,4 +1,8 @@
-import { GetOrganizationsResponse, PatchUsersByIdBody } from "./auth0.types.ts";
+import {
+  GetOrganizationsResponse,
+  GetUsersByIdResponse,
+  PatchUsersByIdBody,
+} from "./auth0.types.ts";
 import { buildResponse, ReturnValue } from "./_utils.ts";
 
 export function getAuth0Client({
@@ -65,8 +69,11 @@ export function getAuth0Client({
   // object structure should reflect https://auth0.com/docs/api/management/v2#!/Users/get_user_roles
   return {
     users: {
+      get: ({ id }: { id: string }) => {
+        return authedFetch<GetUsersByIdResponse>(`/users/${id}`);
+      },
       // get a users roles
-      roles: (id: string) => {
+      roles: ({ id }: { id: string }) => {
         //https://auth0.com/docs/api/management/v2#!/Users/get_user_roles
         return authedFetch<{ id: string; name: string; description: string }[]>(
           `/users/${id}/roles`
@@ -86,27 +93,39 @@ export function getAuth0Client({
           body: JSON.stringify({ roles }),
         });
       },
-      update: ({ id, updateBody }: { id: string; updateBody: PatchUsersByIdBody }) => {
+      update: ({
+        id,
+        updateBody,
+      }: {
+        id: string;
+        updateBody: PatchUsersByIdBody;
+      }) => {
         return authedFetch(`/users/${id}`, {
           method: "PATCH",
-          body: JSON.stringify(updateBody)
-        })
-      }
+          body: JSON.stringify(updateBody),
+        });
+      },
     },
 
     organizations: {
       get: ({ from, take }: { from?: string; take?: number }) => {
         // TODO use the query params
         // https://auth0.com/docs/api/management/v2#!/Organizations/get_organizations
-        return authedFetch<GetOrganizationsResponse[]>(`/organizations`)
+        return authedFetch<GetOrganizationsResponse[]>(`/organizations`);
       },
-      addMembers: ({ orgId, members }: { orgId: string; members: string[] }) => {
+      addMembers: ({
+        orgId,
+        members,
+      }: {
+        orgId: string;
+        members: string[];
+      }) => {
         return authedFetch(`/organizations/${orgId}/members`, {
           method: "POST",
           body: JSON.stringify({
-            members
-          })
-        })
+            members,
+          }),
+        });
       },
     },
   };
