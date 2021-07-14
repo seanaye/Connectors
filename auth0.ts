@@ -1,3 +1,4 @@
+import { GetOrganizationsResponse, PatchUsersByIdBody } from "./auth0.types.ts";
 import { buildResponse, ReturnValue } from "./_utils.ts";
 
 export function getAuth0Client({
@@ -85,11 +86,19 @@ export function getAuth0Client({
           body: JSON.stringify({ roles }),
         });
       },
+      update: ({ id, updateBody }: { id: string; updateBody: PatchUsersByIdBody }) => {
+        return authedFetch(`/users/${id}`, {
+          method: "PATCH",
+          body: JSON.stringify(updateBody)
+        })
+      }
     },
 
     organizations: {
       get: ({ from, take }: { from?: string; take?: number }) => {
-        return authedFetch(`/organizations`)
+        // TODO use the query params
+        // https://auth0.com/docs/api/management/v2#!/Organizations/get_organizations
+        return authedFetch<GetOrganizationsResponse[]>(`/organizations`)
       },
       addMembers: ({ orgId, members }: { orgId: string; members: string[] }) => {
         return authedFetch(`/organizations/${orgId}/members`, {
