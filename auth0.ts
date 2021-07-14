@@ -3,21 +3,19 @@ import { buildResponse, ReturnValue } from "./_utils.ts";
 export function getAuth0Client({
   clientId,
   clientSecret,
-  baseUrl
+  baseUrl,
 }: {
   clientId?: string;
   clientSecret?: string;
-  baseUrl?: string
+  baseUrl?: string;
 }) {
   if (!clientId || !clientSecret || !baseUrl) {
     throw new Error(
-      `Could not initialize auth0 client, env vars not set. ${
-        JSON.stringify({
-          clientId,
-          clientSecret,
-          baseUrl
-        })
-      }`,
+      `Could not initialize auth0 client, env vars not set. ${JSON.stringify({
+        clientId,
+        clientSecret,
+        baseUrl,
+      })}`
     );
   }
   const getAccessToken = async () => {
@@ -33,8 +31,8 @@ export function getAuth0Client({
       }),
     });
 
-    const { access_token } = await tokenRes.json();
-    return access_token;
+    const { access_token: accessToken } = await tokenRes.json();
+    return accessToken;
   };
 
   // cache access token
@@ -42,7 +40,7 @@ export function getAuth0Client({
 
   const authedFetch = async <T = Record<string, any>>(
     url: string,
-    opts?: RequestInit,
+    opts?: RequestInit
   ): ReturnValue<T> => {
     if (!accessToken) {
       accessToken = await getAccessToken();
@@ -53,14 +51,14 @@ export function getAuth0Client({
       "content-type": "application/json",
     };
     const newOpts = Object.assign(opts || {}, { headers });
-    const res = await fetch(url, newOpts);
+    const res = await fetch(`${baseUrl}${url}`, newOpts);
     if (res.status === 401) {
       // refresh access token
       accessToken = await getAccessToken();
       // retry request
       return await authedFetch(url, opts);
     }
-    return await buildResponse<T>(res)
+    return await buildResponse<T>(res);
   };
 
   // object structure should reflect https://auth0.com/docs/api/management/v2#!/Users/get_user_roles
@@ -70,22 +68,36 @@ export function getAuth0Client({
       roles: (id: string) => {
         //https://auth0.com/docs/api/management/v2#!/Users/get_user_roles
         return authedFetch<{ id: string; name: string; description: string }[]>(
-          `${baseUrl}/users/${id}/roles`,
+          `/users/${id}/roles`
         );
       },
       addRoles: ({ id, roles }: { id: string; roles: string[] }) => {
         //https://auth0.com/docs/api/management/v2#!/Users/post_user_roles
-        return authedFetch<null>(`${baseUrl}/users/${id}/roles`, {
+        return authedFetch<null>(`/users/${id}/roles`, {
           method: "POST",
           body: JSON.stringify({ roles }),
         });
       },
       //https://auth0.com/docs/api/management/v2#!/Users/delete_user_roles
       deleteRoles: ({ id, roles }: { id: string; roles: string[] }) => {
-        return authedFetch(`${baseUrl}/users/${id}/roles`, {
+        return authedFetch(`/users/${id}/roles`, {
           method: "DELETE",
           body: JSON.stringify({ roles }),
         });
+      },
+    },
+
+    organizations: {
+      get: ({ from, take }: { from?: string; take?: number }) => {
+        return authedFetch(`/organizations`)
+      },
+      addMembers: ({ orgId, members }: { orgId: string; members: string[] }) => {
+        return authedFetch(`/organizations/${orgId}/members`, {
+          method: "POST",
+          body: JSON.stringify({
+            members
+          })
+        })
       },
     },
   };
