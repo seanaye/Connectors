@@ -34,6 +34,7 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
     checkout: {
       sessions: {
         create: (input: CheckoutSessionsCreateInput) => {
+          console.log({ input })
           return authedFetch(`/checkout/sessions`, {
             method: "POST",
             body: serializeObject(input)
