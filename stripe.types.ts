@@ -30,7 +30,7 @@ interface LineItem {
   quantity: number;
 }
 
-interface CheckoutSessionsCreateInput {
+export interface CheckoutSessionsCreateInput {
   "cancel_url": string;
   mode: SessionMode;
   "payment_method_types": PaymentMethodTypes[];
