@@ -16,6 +16,7 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
       "content-type": "application/json"
     };
     const newOpts = Object.assign(opts || {}, { headers });
+    console.log({ newOpts })
     const res = await fetch(`${baseUrl}${url}`, newOpts);
     return await buildResponse<T>(res);
   };
