@@ -1,10 +1,10 @@
-enum SessionMode {
+export enum SessionMode {
   payment = "payment",
   setup = "setup",
   subscription = "subscription"
 }
 
-enum PaymentMethodTypes {
+export enum PaymentMethodTypes {
   alipay = "alipay",
   card = "card",
   ideal = "ideal",
