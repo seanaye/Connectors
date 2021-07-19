@@ -4,7 +4,8 @@ export async function buildResponse<T>(
   res: Response
 ): ReturnValue<T> {
   try {
-    const data = await res.json();
+    const clone = res.clone()
+    const data = await clone.json();
     return { res, data: data as T };
   } catch (_e) {
     return { res, data: null };
