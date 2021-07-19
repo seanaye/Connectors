@@ -1,6 +1,14 @@
 import { buildResponse, ReturnValue } from "./_utils.ts";
 import type { CheckoutSessionsCreateInput } from "./stripe.types.ts";
 
+function serializeObject(data: Record<string, any>): string {
+  return Object.keys(data)
+    .map((key) => {
+      return encodeURIComponent(key) + "=" + encodeURIComponent(data[key]);
+    })
+    .join("&");
+}
+
 export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
   if (!stripeKey) {
     throw new Error(`No stripe key provided ${JSON.stringify({ stripeKey })}`);
@@ -11,12 +19,12 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
     opts?: RequestInit
   ): ReturnValue<T> => {
     // build authentication header
-    const headers = { 
+    const headers = {
       Authorization: `Basic ${btoa(`${stripeKey}:`)}`,
-      "content-type": "application/json"
+      "content-type": "application/x-www-form-urlencoded",
     };
     const newOpts = Object.assign(opts || {}, { headers });
-    console.log({ newOpts })
+    console.log({ newOpts });
     const res = await fetch(`${baseUrl}${url}`, newOpts);
     return await buildResponse<T>(res);
   };
@@ -27,9 +35,7 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
         create: (input: CheckoutSessionsCreateInput) => {
           return authedFetch(`/checkout/sessions`, {
             method: "POST",
-            body: JSON.stringify({
-              input,
-            }),
+            body: serializeObject(input)
           });
         },
       },
