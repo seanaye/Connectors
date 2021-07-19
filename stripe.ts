@@ -11,7 +11,10 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
     opts?: RequestInit
   ): ReturnValue<T> => {
     // build authentication header
-    const headers = { Authorization: `Basic ${btoa(`${stripeKey}:`)}` };
+    const headers = { 
+      Authorization: `Basic ${btoa(`${stripeKey}:`)}`,
+      "content-type": "application/json"
+    };
     const newOpts = Object.assign(opts || {}, { headers });
     const res = await fetch(`${baseUrl}${url}`, newOpts);
     return await buildResponse<T>(res);
