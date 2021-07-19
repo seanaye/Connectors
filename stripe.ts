@@ -1,12 +1,41 @@
 import { buildResponse, ReturnValue } from "./_utils.ts";
 import type { CheckoutSessionsCreateInput } from "./stripe.types.ts";
 
-function serializeObject(data: Record<string, any>): string {
-  return Object.keys(data)
-    .map((key) => {
-      return encodeURIComponent(key) + "=" + encodeURIComponent(data[key]);
+// recursively flatten complex objects into a stripe friendly form
+function flattenObject(input: any, predicate: string): Array<[string, string]> {
+  const inType = typeof input
+  if (inType === "number" || inType === "string") {
+    return [[predicate, `${input}`]]
+  }
+
+  if (inType === "object" && Array.isArray(inType)) {
+    return (input as Array<any>).flatMap((val, i) => {
+      return flattenObject(val, `${predicate}[${i}]`)
     })
-    .join("&");
+  } else if (inType === "object") {
+    return Object.entries(input as Record<any, any>).flatMap(([key, value]) => {
+      return flattenObject(value, `${predicate}[${key}]`)
+    })
+  }
+
+  return []
+}
+
+function isPrimitive(val: any) {
+  return val !== Object(val)
+}
+
+function urlEncodeObject(data: Record<string, any>): URLSearchParams {
+  const toSerialize: Array<[string, string]> = []
+  for (const [key, value] of Object.entries(data)) {
+    if (isPrimitive(value)) {
+      toSerialize.push([key, value])
+    } else {
+      const toAdd = flattenObject(key, value)
+      toSerialize.push(...toAdd)
+    }
+  }
+  return new URLSearchParams(toSerialize)
 }
 
 export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
@@ -34,10 +63,12 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
     checkout: {
       sessions: {
         create: (input: CheckoutSessionsCreateInput) => {
+          const body = urlEncodeObject(input)
           console.log({ input })
+          console.log({ body })
           return authedFetch(`/checkout/sessions`, {
             method: "POST",
-            body: serializeObject(input)
+            body
           });
         },
       },
