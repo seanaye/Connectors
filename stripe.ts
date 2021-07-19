@@ -1,4 +1,5 @@
 import { buildResponse, ReturnValue } from "./_utils.ts";
+import type { CheckoutSessionsCreateInput } from "./stripe.types.ts";
 
 export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
   if (!stripeKey) {
@@ -12,14 +13,25 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
     // build authentication header
     const headers = { Authorization: `Basic ${btoa(`${stripeKey}:`)}` };
     const newOpts = Object.assign(opts || {}, { headers });
-    const res = await fetch(url, newOpts);
-    return await buildResponse<T>(res)
+    const res = await fetch(`${baseUrl}${url}`, newOpts);
+    return await buildResponse<T>(res);
   };
 
   return {
-    customer: (customerId: string) =>
-      authedFetch(`${baseUrl}/customers/${customerId}`),
+    checkout: {
+      sessions: {
+        create: (input: CheckoutSessionsCreateInput) => {
+          return authedFetch(`/checkout/sessions`, {
+            method: "POST",
+            body: JSON.stringify({
+              input,
+            }),
+          });
+        },
+      },
+    },
+    customer: (customerId: string) => authedFetch(`/customers/${customerId}`),
   };
 };
 
-export type StripeClient = ReturnType<typeof getStripeClient>
+export type StripeClient = ReturnType<typeof getStripeClient>;
