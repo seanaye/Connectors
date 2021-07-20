@@ -108,7 +108,10 @@ export function getAuth0Client({
     },
 
     organizations: {
-      get: ({ from, take }: { from?: string; take?: number }) => {
+      get: ({ id }: { id: string; }) => {
+        return authedFetch<GetOrganizationsResponse>(`/organizations/${id}`)
+      },
+      getMany: ({ from, take }: { from?: string; take?: number }) => {
         // TODO use the query params
         // https://auth0.com/docs/api/management/v2#!/Organizations/get_organizations
         return authedFetch<GetOrganizationsResponse[]>(`/organizations`);
