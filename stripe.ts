@@ -53,8 +53,6 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
       "content-type": "application/x-www-form-urlencoded",
     };
     const newOpts = Object.assign(opts || {}, { headers });
-    console.log({ body: newOpts?.body });
-    console.log(newOpts?.body)
     const res = await fetch(`${baseUrl}${url}`, newOpts);
     return await buildResponse<T>(res);
   };
@@ -64,8 +62,6 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
       sessions: {
         create: (input: CheckoutSessionsCreateInput) => {
           const body = urlEncodeObject(input)
-          console.log({ input })
-          console.log({ body })
           return authedFetch(`/checkout/sessions`, {
             method: "POST",
             body
