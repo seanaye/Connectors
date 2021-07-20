@@ -31,7 +31,7 @@ function urlEncodeObject(data: Record<string, any>): URLSearchParams {
     if (isPrimitive(value)) {
       toSerialize.push([key, value])
     } else {
-      const toAdd = flattenObject(key, value)
+      const toAdd = flattenObject(value, key)
       toSerialize.push(...toAdd)
     }
   }
