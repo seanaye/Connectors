@@ -1,41 +1,44 @@
 import { buildResponse, ReturnValue } from "./_utils.ts";
-import type { CheckoutSessionsCreateInput } from "./stripe.types.ts";
+import type {
+  CheckoutSessionsCreateInput,
+  PortalSessionsCreateInput,
+} from "./stripe.types.ts";
 
 // recursively flatten complex objects into a stripe friendly form
 function flattenObject(input: any, predicate: string): Array<[string, string]> {
-  const inType = typeof input
+  const inType = typeof input;
   if (inType === "number" || inType === "string") {
-    return [[predicate, `${input}`]]
+    return [[predicate, `${input}`]];
   }
 
   if (inType === "object" && Array.isArray(inType)) {
     return (input as Array<any>).flatMap((val, i) => {
-      return flattenObject(val, `${predicate}[${i}]`)
-    })
+      return flattenObject(val, `${predicate}[${i}]`);
+    });
   } else if (inType === "object") {
     return Object.entries(input as Record<any, any>).flatMap(([key, value]) => {
-      return flattenObject(value, `${predicate}[${key}]`)
-    })
+      return flattenObject(value, `${predicate}[${key}]`);
+    });
   }
 
-  return []
+  return [];
 }
 
 function isPrimitive(val: any) {
-  return val !== Object(val)
+  return val !== Object(val);
 }
 
 function urlEncodeObject(data: Record<string, any>): URLSearchParams {
-  const toSerialize: Array<[string, string]> = []
+  const toSerialize: Array<[string, string]> = [];
   for (const [key, value] of Object.entries(data)) {
     if (isPrimitive(value)) {
-      toSerialize.push([key, value])
+      toSerialize.push([key, value]);
     } else {
-      const toAdd = flattenObject(value, key)
-      toSerialize.push(...toAdd)
+      const toAdd = flattenObject(value, key);
+      toSerialize.push(...toAdd);
     }
   }
-  return new URLSearchParams(toSerialize)
+  return new URLSearchParams(toSerialize);
 }
 
 export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
@@ -61,15 +64,24 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
     checkout: {
       sessions: {
         create: (input: CheckoutSessionsCreateInput) => {
-          const body = urlEncodeObject(input)
           return authedFetch(`/checkout/sessions`, {
             method: "POST",
-            body
+            body: urlEncodeObject(input),
           });
         },
       },
     },
     customer: (customerId: string) => authedFetch(`/customers/${customerId}`),
+    billingPortal: {
+      sessions: {
+        create: (input: PortalSessionsCreateInput) => {
+          return authedFetch(`/billing_portal/sessions`, {
+            method: "POST",
+            body: urlEncodeObject(input),
+          });
+        },
+      },
+    },
   };
 };
 

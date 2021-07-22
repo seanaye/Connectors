@@ -41,3 +41,8 @@ export interface CheckoutSessionsCreateInput {
   "line_items": LineItem[];
   "allow_promotion_codes": boolean;
 }
+
+export interface PortalSessionsCreateInput {
+  customer: string;
+  "return_url": string;
+}
