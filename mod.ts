@@ -5,3 +5,4 @@ export { getAuth0Client } from "./auth0.ts"
 export type { Auth0Client } from "./auth0.ts"
 
 export { SessionMode, PaymentMethodTypes } from "./stripe.types.ts"
+export type { ReturnValue } from "./_utils.ts"
