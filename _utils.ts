@@ -1,8 +1,8 @@
-export type ReturnValue<T> = Promise<{ res: Response, data: T|null }>
+export type ReturnValue<T> = { res: Response, data: T|null }
 
 export async function buildResponse<T>(
   res: Response
-): ReturnValue<T> {
+): Promise<ReturnValue<T>> {
   try {
     const clone = res.clone()
     const data = await clone.json();
