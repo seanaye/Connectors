@@ -1,4 +1,4 @@
-import { buildResponse, ReturnValue } from "./_utils.ts";
+import { addExpand, buildResponse, ReturnValue, uri, urlEncodeObject } from "./_utils.ts";
 import type {
   CheckoutSessionsCreateInput,
   ListAllPricesInput,
@@ -6,63 +6,7 @@ import type {
 UpdatePriceInput,
 } from "./stripe.types.ts";
 
-function camelToUnderscore(key: string) {
-   var result = key.replace( /([A-Z])/g, " $1" );
-   return result.split(' ').join('_').toLowerCase();
-}
 
-// recursively flatten complex objects into a stripe friendly form
-function flattenObject(input: any, predicate: string): Array<[string, string]> {
-  const inType = typeof input;
-  if (inType === "number" || inType === "string") {
-    return [[camelToUnderscore(predicate), `${input}`]];
-  }
-
-  if (inType === "object" && Array.isArray(inType)) {
-    return (input as Array<any>).flatMap((val, i) => {
-      return flattenObject(val, `${predicate}[${i}]`);
-    });
-  } else if (inType === "object") {
-    return Object.entries(input as Record<any, any>).flatMap(([key, value]) => {
-      return flattenObject(value, `${predicate}[${key}]`);
-    });
-  }
-
-  return [];
-}
-
-function isPrimitive(val: any) {
-  return val !== Object(val);
-}
-
-function urlEncodeObject(data: Record<string, any>): URLSearchParams {
-  const toSerialize: Array<[string, string]> = [];
-  for (const [key, value] of Object.entries(data)) {
-    if (isPrimitive(value)) {
-      toSerialize.push([camelToUnderscore(key), value]);
-    } else {
-      const toAdd = flattenObject(value, key);
-      toSerialize.push(...toAdd);
-    }
-  }
-  return new URLSearchParams(toSerialize);
-}
-
-const baseUrl = new URL("https://api.stripe.com");
-
-function makeURL(path: string, version = "/v1"): URL {
-  return new URL(`${version}${path}`, baseUrl);
-}
-
-function addExpand(
-  toExpand: string[],
-  params: URLSearchParams
-): URLSearchParams {
-  for (const exp of toExpand) {
-    params.append(`expand[]`, exp);
-  }
-  return params;
-}
 
 export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
   if (!stripeKey) {
@@ -88,7 +32,7 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
     checkout: {
       sessions: {
         create: (input: CheckoutSessionsCreateInput) => {
-          return authedFetch(makeURL(`/checkout/sessions`), {
+          return authedFetch(uri(`/checkout/sessions`), {
             method: "POST",
             body: urlEncodeObject(input),
           });
@@ -96,11 +40,11 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
       },
     },
     customer: (customerId: string) =>
-      authedFetch(makeURL(`/customers/${customerId}`)),
+      authedFetch(uri(`/customers/${customerId}`)),
     billingPortal: {
       sessions: {
         create: (input: PortalSessionsCreateInput) => {
-          return authedFetch(makeURL(`/billing_portal/sessions`), {
+          return authedFetch(uri(`/billing_portal/sessions`), {
             method: "POST",
             body: urlEncodeObject(input),
           });
@@ -109,12 +53,12 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
     },
     prices: {
       list: (input: ListAllPricesInput, expand: Array<"data.product">) => {
-        const url = makeURL(`/prices`);
+        const url = uri(`/prices`);
         url.search = addExpand(expand, urlEncodeObject(input)).toString();
         return authedFetch(url);
       },
       update: ({ id, ...args }: UpdatePriceInput) => {
-        return authedFetch(makeURL(`/prices/${id}`), {
+        return authedFetch(uri(`/prices/${id}`), {
           method: "POST",
           body: urlEncodeObject(args)
         })
