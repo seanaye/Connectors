@@ -31,20 +31,20 @@ interface LineItem {
 }
 
 export interface CheckoutSessionsCreateInput {
-  "cancel_url": string;
+  cancelUrl: string;
   mode: SessionMode;
-  "payment_method_types": PaymentMethodTypes[];
-  "success_url": string;
-  "client_reference_id"?: string;
+  paymentMethodTypes: PaymentMethodTypes[];
+  successUrl: string;
+  clientReferenceId?: string;
   customer?: string;
-  "customer_email"?: string;
-  "line_items": LineItem[];
-  "allow_promotion_codes": boolean;
+  customerEmail?: string;
+  lineItems: LineItem[];
+  allowPromotionCodes: boolean;
 }
 
 export interface PortalSessionsCreateInput {
   customer: string;
-  "return_url": string;
+  returnUrl: string;
 }
 
 export interface ListAllPricesInput {
@@ -53,7 +53,7 @@ export interface ListAllPricesInput {
   product?: string;
   type?: "recuring"|"one_time"
   limit?: number
-  "starting_after"?: string;
+  startingAfter?: string;
 }
 
 export interface UpdatePriceInput {

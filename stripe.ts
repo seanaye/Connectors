@@ -6,11 +6,16 @@ import type {
 UpdatePriceInput,
 } from "./stripe.types.ts";
 
+function camelToUnderscore(key: string) {
+   var result = key.replace( /([A-Z])/g, " $1" );
+   return result.split(' ').join('_').toLowerCase();
+}
+
 // recursively flatten complex objects into a stripe friendly form
 function flattenObject(input: any, predicate: string): Array<[string, string]> {
   const inType = typeof input;
   if (inType === "number" || inType === "string") {
-    return [[predicate, `${input}`]];
+    return [[camelToUnderscore(predicate), `${input}`]];
   }
 
   if (inType === "object" && Array.isArray(inType)) {
@@ -34,7 +39,7 @@ function urlEncodeObject(data: Record<string, any>): URLSearchParams {
   const toSerialize: Array<[string, string]> = [];
   for (const [key, value] of Object.entries(data)) {
     if (isPrimitive(value)) {
-      toSerialize.push([key, value]);
+      toSerialize.push([camelToUnderscore(key), value]);
     } else {
       const toAdd = flattenObject(value, key);
       toSerialize.push(...toAdd);
