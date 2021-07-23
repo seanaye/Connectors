@@ -102,7 +102,7 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
       },
     },
     prices: {
-      list: (input: ListAllPricesInput, expand: Array<"product">) => {
+      list: (input: ListAllPricesInput, expand: Array<"data.product">) => {
         const url = makeURL(`/prices`);
         url.search = addExpand(expand, urlEncodeObject(input)).toString();
         return authedFetch(url);
