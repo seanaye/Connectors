@@ -55,3 +55,10 @@ export interface ListAllPricesInput {
   limit?: number
   "starting_after"?: string;
 }
+
+export interface UpdatePriceInput {
+  active?: boolean;
+  metadata?: Record<string, string>;
+  nickname?: string;
+  id: string;
+}

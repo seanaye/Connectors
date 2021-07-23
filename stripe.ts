@@ -3,6 +3,7 @@ import type {
   CheckoutSessionsCreateInput,
   ListAllPricesInput,
   PortalSessionsCreateInput,
+UpdatePriceInput,
 } from "./stripe.types.ts";
 
 // recursively flatten complex objects into a stripe friendly form
@@ -107,6 +108,12 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
         url.search = addExpand(expand, urlEncodeObject(input)).toString();
         return authedFetch(url);
       },
+      update: ({ id, ...args }: UpdatePriceInput) => {
+        return authedFetch(makeURL(`/prices/${id}`), {
+          method: "POST",
+          body: urlEncodeObject(args)
+        })
+      }
     },
   };
 };
