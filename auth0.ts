@@ -88,7 +88,7 @@ export function getAuth0Client({
       },
       //https://auth0.com/docs/api/management/v2#!/Users/delete_user_roles
       deleteRoles: ({ id, roles }: { id: string; roles: string[] }) => {
-        return authedFetch(`/users/${id}/roles`, {
+        return authedFetch<null>(`/users/${id}/roles`, {
           method: "DELETE",
           body: JSON.stringify({ roles }),
         });
