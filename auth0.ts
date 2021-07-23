@@ -46,7 +46,7 @@ export function getAuth0Client({
   const authedFetch = async <T = Record<string, any>>(
     url: string,
     opts?: RequestInit
-  ): ReturnValue<T> => {
+  ): Promise<ReturnValue<T>> => {
     if (!accessToken) {
       accessToken = await getAccessToken();
     }
