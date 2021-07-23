@@ -42,18 +42,26 @@ function urlEncodeObject(data: Record<string, any>): URLSearchParams {
   return new URLSearchParams(toSerialize);
 }
 
-
 const baseUrl = new URL("https://api.stripe.com/v1");
 
 function makeURL(path: string): URL {
-  return new URL(path, baseUrl)
+  return new URL(path, baseUrl);
+}
+
+function addExpand(
+  toExpand: string[],
+  params: URLSearchParams
+): URLSearchParams {
+  for (const exp of toExpand) {
+    params.append(`expand[]`, exp);
+  }
+  return params;
 }
 
 export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
   if (!stripeKey) {
     throw new Error(`No stripe key provided ${JSON.stringify({ stripeKey })}`);
   }
-
 
   async function authedFetch<T = Record<string, any>>(
     url: URL,
@@ -67,8 +75,7 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
     const newOpts = Object.assign(opts || {}, { headers });
     const res = await fetch(url, newOpts);
     return await buildResponse<T>(res);
-  };
-
+  }
 
   // return the client object
   return {
@@ -82,7 +89,8 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
         },
       },
     },
-    customer: (customerId: string) => authedFetch(makeURL(`/customers/${customerId}`)),
+    customer: (customerId: string) =>
+      authedFetch(makeURL(`/customers/${customerId}`)),
     billingPortal: {
       sessions: {
         create: (input: PortalSessionsCreateInput) => {
@@ -94,12 +102,12 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
       },
     },
     prices: {
-      list: (input: ListAllPricesInput) => {
-        const url = makeURL(`/prices`)
-        url.search = urlEncodeObject(input).toString()
-        return authedFetch(url)
-      }
-    }
+      list: (input: ListAllPricesInput, expand: Array<"product">) => {
+        const url = makeURL(`/prices`);
+        url.search = addExpand(expand, urlEncodeObject(input)).toString();
+        return authedFetch(url);
+      },
+    },
   };
 };
 
