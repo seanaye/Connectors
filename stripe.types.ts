@@ -52,4 +52,6 @@ export interface ListAllPricesInput {
   currency?: string;
   product?: string;
   type?: "recuring"|"one_time"
+  limit?: number
+  "starting_after"?: string;
 }
