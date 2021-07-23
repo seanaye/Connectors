@@ -42,10 +42,10 @@ function urlEncodeObject(data: Record<string, any>): URLSearchParams {
   return new URLSearchParams(toSerialize);
 }
 
-const baseUrl = new URL("https://api.stripe.com/v1");
+const baseUrl = new URL("https://api.stripe.com");
 
-function makeURL(path: string): URL {
-  return new URL(path, baseUrl);
+function makeURL(path: string, version = "/v1"): URL {
+  return new URL(`${version}${path}`, baseUrl);
 }
 
 function addExpand(
