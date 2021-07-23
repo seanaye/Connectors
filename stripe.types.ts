@@ -46,3 +46,10 @@ export interface PortalSessionsCreateInput {
   customer: string;
   "return_url": string;
 }
+
+export interface ListAllPricesInput {
+  active?: boolean;
+  currency?: string;
+  product?: string;
+  type?: "recuring"|"one_time"
+}

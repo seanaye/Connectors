@@ -1,6 +1,7 @@
 import { buildResponse, ReturnValue } from "./_utils.ts";
 import type {
   CheckoutSessionsCreateInput,
+  ListAllPricesInput,
   PortalSessionsCreateInput,
 } from "./stripe.types.ts";
 
@@ -41,47 +42,64 @@ function urlEncodeObject(data: Record<string, any>): URLSearchParams {
   return new URLSearchParams(toSerialize);
 }
 
+
+const baseUrl = new URL("https://api.stripe.com/v1");
+
+function makeURL(path: string): URL {
+  return new URL(path, baseUrl)
+}
+
 export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
   if (!stripeKey) {
     throw new Error(`No stripe key provided ${JSON.stringify({ stripeKey })}`);
   }
-  const baseUrl = "https://api.stripe.com/v1";
-  const authedFetch = async <T = Record<string, any>>(
-    url: string,
+
+
+  async function authedFetch<T = Record<string, any>>(
+    url: URL,
     opts?: RequestInit
-  ): ReturnValue<T> => {
+  ): Promise<ReturnValue<T>> {
     // build authentication header
     const headers = {
       Authorization: `Basic ${btoa(`${stripeKey}:`)}`,
       "content-type": "application/x-www-form-urlencoded",
     };
     const newOpts = Object.assign(opts || {}, { headers });
-    const res = await fetch(`${baseUrl}${url}`, newOpts);
+    const res = await fetch(url, newOpts);
     return await buildResponse<T>(res);
   };
 
+
+  // return the client object
   return {
     checkout: {
       sessions: {
         create: (input: CheckoutSessionsCreateInput) => {
-          return authedFetch(`/checkout/sessions`, {
+          return authedFetch(makeURL(`/checkout/sessions`), {
             method: "POST",
             body: urlEncodeObject(input),
           });
         },
       },
     },
-    customer: (customerId: string) => authedFetch(`/customers/${customerId}`),
+    customer: (customerId: string) => authedFetch(makeURL(`/customers/${customerId}`)),
     billingPortal: {
       sessions: {
         create: (input: PortalSessionsCreateInput) => {
-          return authedFetch(`/billing_portal/sessions`, {
+          return authedFetch(makeURL(`/billing_portal/sessions`), {
             method: "POST",
             body: urlEncodeObject(input),
           });
         },
       },
     },
+    prices: {
+      list: (input: ListAllPricesInput) => {
+        const url = makeURL(`/prices`)
+        url.search = urlEncodeObject(input).toString()
+        return authedFetch(url)
+      }
+    }
   };
 };
 
