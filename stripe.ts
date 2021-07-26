@@ -1,12 +1,17 @@
-import { addExpand, buildResponse, ReturnValue, uri, urlEncodeObject } from "./_utils.ts";
+import {
+  addExpand,
+  buildResponse,
+  ReturnValue,
+  uri,
+  urlEncodeObject,
+} from "./_utils.ts";
 import type {
   CheckoutSessionsCreateInput,
+  CreateSubscriptionInput,
   ListAllPricesInput,
   PortalSessionsCreateInput,
-UpdatePriceInput,
+  UpdatePriceInput,
 } from "./stripe.types.ts";
-
-
 
 export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
   if (!stripeKey) {
@@ -60,9 +65,17 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
       update: ({ id, ...args }: UpdatePriceInput) => {
         return authedFetch(uri(`/prices/${id}`), {
           method: "POST",
-          body: urlEncodeObject(args)
-        })
-      }
+          body: urlEncodeObject(args),
+        });
+      },
+    },
+    subscriptions: {
+      create: (input: CreateSubscriptionInput) => {
+        return authedFetch(uri(`/subscriptions`), {
+          method: "POST",
+          body: urlEncodeObject(input),
+        });
+      },
     },
   };
 };

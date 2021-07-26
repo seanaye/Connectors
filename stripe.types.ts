@@ -62,3 +62,14 @@ export interface UpdatePriceInput {
   nickname?: string;
   id: string;
 }
+
+export interface CreateSubscriptionInput {
+  customer: string;
+  items: Array<{
+    price: string;
+    metadata?: Record<string, string>
+    quantity?: number;
+  }>;
+  coupon?: string;
+  trialPeriodDays?: number;
+}
