@@ -10,6 +10,7 @@ import type {
   CreateSubscriptionInput,
   ListAllPricesInput,
   PortalSessionsCreateInput,
+  UpdateCustomerInput,
   UpdatePriceInput,
 } from "./stripe.types.ts";
 
@@ -44,8 +45,15 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
         },
       },
     },
-    customer: (customerId: string) =>
-      authedFetch(uri(`/customers/${customerId}`)),
+    customers: {
+      get: (customerId: string) => authedFetch(uri(`/customers/${customerId}`)),
+      update: ({ id, ...args }: UpdateCustomerInput) => {
+        return authedFetch(uri(`/customers/${id}`), {
+          method: "POST",
+          body: urlEncodeObject(args)
+        })
+      }
+    },
     billingPortal: {
       sessions: {
         create: (input: PortalSessionsCreateInput) => {

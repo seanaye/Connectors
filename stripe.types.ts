@@ -71,5 +71,14 @@ export interface CreateSubscriptionInput {
     quantity?: number;
   }>;
   coupon?: string;
+  promotionCode?: string;
   trialPeriodDays?: number;
+}
+
+export interface UpdateCustomerInput {
+  id: string;
+  description?: string;
+  email?: string;
+  metadata?: Record<string, string>
+  name?: string;
 }
