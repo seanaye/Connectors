@@ -46,7 +46,7 @@ export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
       },
     },
     customers: {
-      get: (customerId: string) => authedFetch(uri(`/customers/${customerId}`)),
+      get: ({ id }: { id: string }) => authedFetch(uri(`/customers/${id}`)),
       update: ({ id, ...args }: UpdateCustomerInput) => {
         return authedFetch(uri(`/customers/${id}`), {
           method: "POST",
