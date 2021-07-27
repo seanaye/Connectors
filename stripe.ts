@@ -85,7 +85,7 @@ export const getStripeClient = (args: { stripeKey: string }) => {
         });
       },
       list: (input: ListSubscriptionsInput) => {
-        const url = uri(`subscriptions`)
+        const url = uri(`/subscriptions`)
         url.search = urlEncodeObject(input).toString()
         return authedFetch(url)
       }
