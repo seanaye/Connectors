@@ -4,6 +4,7 @@ import {
   ReturnValue,
   uri,
   urlEncodeObject,
+validateArgs,
 } from "./_utils.ts";
 import type {
   CheckoutSessionsCreateInput,
@@ -14,10 +15,8 @@ import type {
   UpdatePriceInput,
 } from "./stripe.types.ts";
 
-export const getStripeClient = ({ stripeKey }: { stripeKey?: string }) => {
-  if (!stripeKey) {
-    throw new Error(`No stripe key provided ${JSON.stringify({ stripeKey })}`);
-  }
+export const getStripeClient = (args: { stripeKey: string }) => {
+  const { stripeKey } = validateArgs(args)
 
   async function authedFetch<T = Record<string, any>>(
     url: URL,

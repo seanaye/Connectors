@@ -3,35 +3,32 @@ import {
   GetUsersByIdResponse,
   PatchUsersByIdBody,
 } from "./auth0.types.ts";
-import { buildResponse, ReturnValue } from "./_utils.ts";
+import { buildResponse, ReturnValue, validateArgs } from "./_utils.ts";
 
-export function getAuth0Client({
-  clientId,
-  clientSecret,
-  baseUrl,
-}: {
-  clientId?: string;
-  clientSecret?: string;
-  baseUrl?: string;
+export function getAuth0Client(args: {
+  clientId: string;
+  clientSecret: string;
+  baseUrl: string;
+  accessTokenUrl: string;
+  audience: string;
 }) {
-  if (!clientId || !clientSecret || !baseUrl) {
-    throw new Error(
-      `Could not initialize auth0 client, env vars not set. ${JSON.stringify({
-        clientId,
-        clientSecret,
-        baseUrl,
-      })}`
-    );
-  }
+  const {
+    clientId,
+    clientSecret,
+    baseUrl,
+    accessTokenUrl,
+    audience,
+  } = validateArgs(args);
+
   const getAccessToken = async () => {
     // get token to access auth0 management api
-    const tokenRes = await fetch("https://coparse.auth0.com/oauth/token", {
+    const tokenRes = await fetch(accessTokenUrl, {
       headers: { "content-type": "application/json" },
       method: "POST",
       body: JSON.stringify({
         client_id: clientId,
         client_secret: clientSecret,
-        audience: "https://coparse.auth0.com/api/v2/",
+        audience,
         grant_type: "client_credentials",
       }),
     });
@@ -108,8 +105,8 @@ export function getAuth0Client({
     },
 
     organizations: {
-      get: ({ id }: { id: string; }) => {
-        return authedFetch<GetOrganizationsResponse>(`/organizations/${id}`)
+      get: ({ id }: { id: string }) => {
+        return authedFetch<GetOrganizationsResponse>(`/organizations/${id}`);
       },
       getMany: ({ from, take }: { from?: string; take?: number }) => {
         // TODO use the query params

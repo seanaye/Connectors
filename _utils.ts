@@ -70,3 +70,16 @@ export function addExpand(
   }
   return params;
 }
+
+export function validateArgs(args: Record<string, string>) {
+  for (const arg of Object.entries(args)) {
+    if (!arg) {
+      throw new Error(
+        `Could not initialize client, env vars not set. ${
+          JSON.stringify(args)
+        }`,
+      );
+    }
+  }
+  return args
+}
