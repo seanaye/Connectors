@@ -90,6 +90,11 @@ export const getStripeClient = (args: { stripeKey: string }) => {
         return authedFetch(url)
       }
     },
+    products: {
+      get: ({ id }: { id: string }) => {
+        return authedFetch(uri(`/products/${id}`))
+      }
+    }
   };
 };
 
