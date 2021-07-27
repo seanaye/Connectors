@@ -1,28 +1,23 @@
-export enum SessionMode {
-  payment = "payment",
-  setup = "setup",
-  subscription = "subscription"
-}
+type SessionMode = "payment" | "setup" | "subscription";
 
-export enum PaymentMethodTypes {
-  alipay = "alipay",
-  card = "card",
-  ideal = "ideal",
-  fpx = "fpx",
-  bacsDebit = "bacs_debit",
-  bancontact = "bancontact",
-  giropay = "giropay",
-  p24 = "p24",
-  eps = "eps",
-  sofort = "sofort",
-  sepaDebit = "sepa_debit",
-  grabpay = "grabpay",
-  afterpayClearpay = "afterpay_clearpay",
-  acssDebit = "acss_debit",
-  wechatPay = "wechat_pay",
-  boleto = "boleto",
-  oxxo = "oxxo"
-}
+type PaymentMethodTypes =
+  | "alipay"
+  | "card"
+  | "ideal"
+  | "fpx"
+  | "bacs_debit"
+  | "bancontact"
+  | "giropay"
+  | "p24"
+  | "eps"
+  | "sofort"
+  | "sepa_debit"
+  | "grabpay"
+  | "afterpay_clearpay"
+  | "acss_debit"
+  | "wechat_pay"
+  | "boleto"
+  | "oxxo";
 
 interface LineItem {
   price: string;
@@ -51,8 +46,8 @@ export interface ListAllPricesInput {
   active?: boolean;
   currency?: string;
   product?: string;
-  type?: "recuring"|"one_time"
-  limit?: number
+  type?: "recuring" | "one_time";
+  limit?: number;
   startingAfter?: string;
 }
 
@@ -67,7 +62,7 @@ export interface CreateSubscriptionInput {
   customer: string;
   items: Array<{
     price: string;
-    metadata?: Record<string, string>
+    metadata?: Record<string, string>;
     quantity?: number;
   }>;
   coupon?: string;
@@ -79,6 +74,24 @@ export interface UpdateCustomerInput {
   id: string;
   description?: string;
   email?: string;
-  metadata?: Record<string, string>
+  metadata?: Record<string, string>;
   name?: string;
+}
+
+type SubscriptionStatus =
+  | "active"
+  | "past_due"
+  | "unpaid"
+  | "canceled"
+  | "incomplete"
+  | "incomplete_expired"
+  | "trialing"
+  | "all"
+  | "ended";
+
+export interface ListSubscriptionsInput {
+  customer?: string;
+  price?: string;
+  status?: SubscriptionStatus;
+  limit?: number;
 }

@@ -10,6 +10,7 @@ import type {
   CheckoutSessionsCreateInput,
   CreateSubscriptionInput,
   ListAllPricesInput,
+  ListSubscriptionsInput,
   PortalSessionsCreateInput,
   UpdateCustomerInput,
   UpdatePriceInput,
@@ -83,6 +84,11 @@ export const getStripeClient = (args: { stripeKey: string }) => {
           body: urlEncodeObject(input),
         });
       },
+      list: (input: ListSubscriptionsInput) => {
+        const url = uri(`subscriptions`)
+        url.search = urlEncodeObject(input).toString()
+        return authedFetch(url)
+      }
     },
   };
 };
