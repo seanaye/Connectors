@@ -31,8 +31,7 @@ function flattenObject(input: any, predicate: string): Array<[string, string]> {
     });
   } else if (inType === "object") {
     return Object.entries(input as Record<any, any>)
-      .filter(([key, value]) => {
-        console.log({ key, value })
+      .filter(([_key, value]) => {
         return !!value
       })
       .flatMap(([key, value]) => {
@@ -50,6 +49,9 @@ function isPrimitive(val: any) {
 export function urlEncodeObject(data: Record<string, any>): URLSearchParams {
   const toSerialize: Array<[string, string]> = [];
   for (const [key, value] of Object.entries(data)) {
+    // if the value is undefined skip adding to request
+    if (!value) continue
+
     if (isPrimitive(value)) {
       toSerialize.push([camelToUnderscore(key), value]);
     } else {
