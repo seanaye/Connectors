@@ -31,7 +31,7 @@ function flattenObject(input: any, predicate: string): Array<[string, string]> {
     });
   } else if (inType === "object") {
     return Object.entries(input as Record<any, any>)
-      .filter(([key, value) => {
+      .filter(([key, value]) => {
         console.log({ key, value })
         return !!value
       })
