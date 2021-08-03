@@ -30,9 +30,14 @@ function flattenObject(input: any, predicate: string): Array<[string, string]> {
       return flattenObject(val, `${predicate}[${i}]`);
     });
   } else if (inType === "object") {
-    return Object.entries(input as Record<any, any>).flatMap(([key, value]) => {
-      return flattenObject(value, `${predicate}[${key}]`);
-    });
+    return Object.entries(input as Record<any, any>)
+      .filter(([key, value) => {
+        console.log({ key, value })
+        return !!value
+      })
+      .flatMap(([key, value]) => {
+        return flattenObject(value, `${predicate}[${key}]`);
+      });
   }
 
   return [];
