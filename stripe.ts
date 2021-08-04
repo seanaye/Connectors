@@ -10,6 +10,7 @@ import type {
   CheckoutSessionsCreateInput,
   CreateSubscriptionInput,
   ListAllPricesInput,
+  ListPromotionCodesInput,
   ListSubscriptionsInput,
   PortalSessionsCreateInput,
   UpdateCustomerInput,
@@ -39,7 +40,7 @@ export const getStripeClient = (args: { stripeKey: string }) => {
     checkout: {
       sessions: {
         create: (input: CheckoutSessionsCreateInput) => {
-          return authedFetch(uri(`/checkout/sessions`), {
+          return authedFetch(uri`/checkout/sessions`, {
             method: "POST",
             body: urlEncodeObject(input),
           });
@@ -47,9 +48,9 @@ export const getStripeClient = (args: { stripeKey: string }) => {
       },
     },
     customers: {
-      get: ({ id }: { id: string }) => authedFetch(uri(`/customers/${id}`)),
+      get: ({ id }: { id: string }) => authedFetch(uri`/customers/${id}`),
       update: ({ id, ...args }: UpdateCustomerInput) => {
-        return authedFetch(uri(`/customers/${id}`), {
+        return authedFetch(uri`/customers/${id}`, {
           method: "POST",
           body: urlEncodeObject(args)
         })
@@ -58,7 +59,7 @@ export const getStripeClient = (args: { stripeKey: string }) => {
     billingPortal: {
       sessions: {
         create: (input: PortalSessionsCreateInput) => {
-          return authedFetch(uri(`/billing_portal/sessions`), {
+          return authedFetch(uri`/billing_portal/sessions`, {
             method: "POST",
             body: urlEncodeObject(input),
           });
@@ -67,12 +68,12 @@ export const getStripeClient = (args: { stripeKey: string }) => {
     },
     prices: {
       list: (input: ListAllPricesInput, expand: Array<"data.product">) => {
-        const url = uri(`/prices`);
+        const url = uri`/prices`;
         url.search = addExpand(expand, urlEncodeObject(input)).toString();
         return authedFetch(url);
       },
       update: ({ id, ...args }: UpdatePriceInput) => {
-        return authedFetch(uri(`/prices/${id}`), {
+        return authedFetch(uri`/prices/${id}`, {
           method: "POST",
           body: urlEncodeObject(args),
         });
@@ -80,18 +81,18 @@ export const getStripeClient = (args: { stripeKey: string }) => {
     },
     subscriptions: {
       create: (input: CreateSubscriptionInput) => {
-        return authedFetch(uri(`/subscriptions`), {
+        return authedFetch(uri`/subscriptions`, {
           method: "POST",
           body: urlEncodeObject(input),
         });
       },
       list: (input: ListSubscriptionsInput) => {
-        const url = uri(`/subscriptions`)
+        const url = uri`/subscriptions`
         url.search = urlEncodeObject(input).toString()
         return authedFetch(url)
       },
       update: ({ id, ...rest }: UpdateSubscriptionInput) => {
-        return authedFetch(uri(`/subscriptions/${id}`), {
+        return authedFetch(uri`/subscriptions/${id}`, {
           method: "POST",
           body: urlEncodeObject(rest)
         })
@@ -99,7 +100,14 @@ export const getStripeClient = (args: { stripeKey: string }) => {
     },
     products: {
       get: ({ id }: { id: string }) => {
-        return authedFetch(uri(`/products/${id}`))
+        return authedFetch(uri`/products/${id}`)
+      }
+    },
+    promotionCodes: {
+      list: (input: ListPromotionCodesInput) => {
+        const url = uri`/promotion_codes`
+        url.search = urlEncodeObject(input).toString()
+        return authedFetch(url)
       }
     }
   };

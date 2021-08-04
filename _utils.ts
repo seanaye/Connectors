@@ -64,8 +64,10 @@ export function urlEncodeObject(data: Record<string, any>): URLSearchParams {
 
 const baseUrl = new URL("https://api.stripe.com");
 
-export function uri(path: string, version = "/v1"): URL {
-  return new URL(`${version}${path}`, baseUrl);
+// tagged template for building stripe URI
+export function uri(strings: TemplateStringsArray, id?: string): URL {
+  const version = "/v1"
+  return new URL(`${version}${strings[0]}${id ?? ""}`, baseUrl);
 }
 
 export function addExpand(

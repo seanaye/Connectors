@@ -100,3 +100,9 @@ export interface UpdateSubscriptionInput {
   id: string;
   promotionCode?: string;
 }
+
+export interface ListPromotionCodesInput {
+  active?: boolean;
+  code?: string;
+  limit?: number;
+}
