@@ -95,3 +95,8 @@ export interface ListSubscriptionsInput {
   status?: SubscriptionStatus;
   limit?: number;
 }
+
+export interface UpdateSubscriptionInput {
+  id: string;
+  promotionCode?: string;
+}

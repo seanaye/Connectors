@@ -14,6 +14,7 @@ import type {
   PortalSessionsCreateInput,
   UpdateCustomerInput,
   UpdatePriceInput,
+UpdateSubscriptionInput,
 } from "./stripe.types.ts";
 
 export const getStripeClient = (args: { stripeKey: string }) => {
@@ -88,6 +89,12 @@ export const getStripeClient = (args: { stripeKey: string }) => {
         const url = uri(`/subscriptions`)
         url.search = urlEncodeObject(input).toString()
         return authedFetch(url)
+      },
+      update: ({ id, ...rest }: UpdateSubscriptionInput) => {
+        return authedFetch(uri(`/subscriptions/${id}`), {
+          method: "POST",
+          body: urlEncodeObject(rest)
+        })
       }
     },
     products: {
