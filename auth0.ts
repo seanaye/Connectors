@@ -22,15 +22,16 @@ export function getAuth0Client(args: {
 
   const getAccessToken = async () => {
     // get token to access auth0 management api
+    const body = new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      audience,
+      grant_type: "client_credentials",
+    });
     const tokenRes = await fetch(accessTokenUrl, {
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/x-www-form-urlencoded" },
       method: "POST",
-      body: JSON.stringify({
-        client_id: clientId,
-        client_secret: clientSecret,
-        audience,
-        grant_type: "client_credentials",
-      }),
+      body,
     });
 
     const { access_token: accessToken } = await tokenRes.json();
