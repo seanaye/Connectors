@@ -27,7 +27,7 @@ export interface GetOrganizationsResponse {
     "logo_url": string;
     colors: Record<string, string>
   };
-  metadata: Record<string, string | number>
+  metadata: Record<string, string>
 }
 
 export interface GetUsersByIdResponse {
@@ -47,8 +47,8 @@ export interface GetUsersByIdResponse {
   "picture": string;
   "updated_at": string;
   "user_id": string;
-  "user_metadata": Record<string, string | number>;
-  "app_metadata": Record<string, string | number>;
+  "user_metadata": Record<string, string>;
+  "app_metadata": Record<string, string>;
   "last_ip": string;
   "last_login": string;
   "logins_count": number;
