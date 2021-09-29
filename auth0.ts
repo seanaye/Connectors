@@ -2,6 +2,7 @@ import {
   GetOrganizationsResponse,
   GetUsersByIdResponse,
   PatchUsersByIdBody,
+  PatchOrganizationsByIdBody
 } from "./auth0.types.ts";
 import { buildResponse, ReturnValue, validateArgs } from "./_utils.ts";
 
@@ -128,6 +129,18 @@ export function getAuth0Client(args: {
           }),
         });
       },
+      update: ({
+        orgId,
+        body
+      }: {
+        orgId: string;
+        body: PatchOrganizationsByIdBody
+      }) => {
+        return authedFetch<GetOrganizationsResponse>(`/organizations/${orgId}`, {
+          method: "PATCH",
+          body: JSON.stringify(body)
+        })
+      }
     },
   };
 }

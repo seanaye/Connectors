@@ -4,8 +4,8 @@ export interface PatchUsersByIdBody {
   email?: string;
   "phone_number"?: string;
   "phone_verified"?: boolean;
-  "user_metadata"?: Record<string, string|number>;
-  "app_metadata"?: Record<string, string|number>;
+  "user_metadata"?: Record<string, string | number>;
+  "app_metadata"?: Record<string, string | number>;
   "given_name"?: string;
   "family_name"?: string;
   name?: string;
@@ -27,7 +27,7 @@ export interface GetOrganizationsResponse {
     "logo_url": string;
     colors: Record<string, string>
   };
-  metadata: Record<string, string|number>
+  metadata: Record<string, string | number>
 }
 
 export interface GetUsersByIdResponse {
@@ -47,9 +47,19 @@ export interface GetUsersByIdResponse {
   "picture": string;
   "updated_at": string;
   "user_id": string;
-  "user_metadata": Record<string, string|number>;
-  "app_metadata": Record<string, string|number>;
+  "user_metadata": Record<string, string | number>;
+  "app_metadata": Record<string, string | number>;
   "last_ip": string;
   "last_login": string;
   "logins_count": number;
+}
+
+export interface PatchOrganizationsByIdBody {
+  "display_name": string;
+  "name": string;
+  "branding"?: {
+    "logo_url": string;
+    "colors": string;
+  };
+  "metadata": Record<string, string>
 }
