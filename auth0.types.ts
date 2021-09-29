@@ -59,7 +59,7 @@ export interface PatchOrganizationsByIdBody {
   "name": string;
   "branding"?: {
     "logo_url": string;
-    "colors": string;
+    "colors": Record<string, string>;
   };
   "metadata": Record<string, string>
 }
