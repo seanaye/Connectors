@@ -2,7 +2,8 @@ import {
   GetOrganizationsResponse,
   GetUsersByIdResponse,
   PatchUsersByIdBody,
-  PatchOrganizationsByIdBody
+  PatchOrganizationsByIdBody,
+  PostOrganizationsBody
 } from "./auth0.types.ts";
 import { buildResponse, ReturnValue, validateArgs } from "./_utils.ts";
 
@@ -105,8 +106,11 @@ export function getAuth0Client(args: {
         });
       },
     },
-
     organizations: {
+      create: (body: PostOrganizationsBody) => authedFetch<PostOrganizationsBody & { id: string }>(`/organizations`, {
+        method: "POST",
+        body: JSON.stringify(body)
+      }),
       get: ({ id }: { id: string }) => {
         return authedFetch<GetOrganizationsResponse>(`/organizations/${id}`);
       },
@@ -136,9 +140,10 @@ export function getAuth0Client(args: {
         orgId: string;
         body: PatchOrganizationsByIdBody
       }) => {
+        const data = JSON.stringify(body)
         return authedFetch<GetOrganizationsResponse>(`/organizations/${orgId}`, {
           method: "PATCH",
-          body: JSON.stringify(body)
+          body: data
         })
       }
     },

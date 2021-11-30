@@ -30,6 +30,12 @@ export interface GetOrganizationsResponse {
   metadata: Record<string, string>
 }
 
+export interface PostOrganizationsBody {
+  name: string;
+  display_name: string;
+  metadata: Record<string, string>;
+}
+
 export interface GetUsersByIdResponse {
   "created_at": string;
   "email": string;
